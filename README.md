@@ -1,5 +1,5 @@
 # `estuff`
-Erlang rebar3 template for creating new Erlang/OTP project.
+Erlang rebar3 template for making new Erlang/OTP project.
 
 
 # Build
@@ -34,4 +34,5 @@ In project directory you can use `make [compile|shell|test|docs|clean|distclean]
 * Add coverage in test options and new target in Makefile for `make cover`.  
 * Add release options in rebar.config and new target in Makefile for `make release`.
 * Add `rebar.config.script` file for changing hex repo to github repo.  
+
 All issues are welcomed.
