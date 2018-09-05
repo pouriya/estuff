@@ -1,0 +1,17 @@
+-sname {{name}}@localhost
+
+-setcookie {{name}}
+
++K true
+
++A 256
+
++pc unicode
+
++P 1000000
+
+-e 65535
+
++Q 134217727
+
++zdbbl 2048

@@ -1,0 +1,35 @@
+{description, "OTP Application."}.
+
+{variables, [{name, "mylib", "Name of the OTP application"}
+            ,{author, "pouriya.jahanbakhsh@gmail.com", "Author's email of this application."}
+            ,{description, "An OTP application", "One line description for this application."}]}.
+
+{template, "estuff.erl", "{{name}}/src/{{name}}.erl"}.
+
+{template, "estuff_app.erl", "{{name}}/src/{{name}}_app.erl"}.
+
+{template, "estuff_sup.erl", "{{name}}/src/{{name}}_sup.erl"}.
+
+{template, "estuff.app.src", "{{name}}/src/{{name}}.app.src"}.
+
+{template, "estuff_utils.erl", "{{name}}/src/{{name}}_utils.erl"}.
+
+{template, "estuff.rebar.config", "{{name}}/rebar.config"}.
+
+{template, "estuff.sys.config", "{{name}}/config/sys.config"}.
+
+{template, "estuff.vm.args", "{{name}}/config/vm.args"}.
+
+{template, "estuff.LICENSE", "{{name}}/LICENSE"}.
+
+{template, "estuff.README.md", "{{name}}/README.md"}.
+
+{template, "estuff.Makefile", "{{name}}/Makefile"}.
+
+{file, "estuff.rebar3", "{{name}}/tools/rebar3"}.
+
+{chmod, "{{name}}/tools/rebar3", 8#755}.
+
+{template, "estuff_test.erl", "{{name}}/test/{{name}}_SUITE.erl"}.
+
+{template, "estuff_include.hrl", "{{name}}/include/{{name}}.hrl"}.
