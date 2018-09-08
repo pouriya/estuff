@@ -3,6 +3,7 @@
 ,[{description, "{{description}}"}
  ,{vsn, "0.0.0"}
  ,{applications, [kernel, stdlib]}
+ ,{mod, {{{name}}_app, undefined}}
  ,{maintainers, ["{{author}}"]}
  ,{licenses, ["UNLICENSED"]}
  ,{links, [{"", ""}]}]}.
