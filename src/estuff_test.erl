@@ -11,6 +11,7 @@
         ,init_per_testcase/2
         ,end_per_testcase/2]).
 
+%% Testcases:
 -export(['1'/1
         ,'2'/1
         ,'3'/1
@@ -33,22 +34,19 @@
 
 
 all() ->
-    IsTestCase = 
-        fun
-            ({Func, Arity}) when Arity == 1 ->
-                try 
-                    _ = erlang:list_to_integer(erlang:atom_to_list(Func)),
-                    true
-                catch
-                    _:_ ->
-                        false
-                end;
-            (_) ->
-                false
+    IsInteger =
+        fun(Func) ->
+            try
+                _ = erlang:list_to_integer(erlang:atom_to_list(Func)),
+                true
+            catch
+                _:_ ->
+                    false
+            end
         end,
     % '1', '2', ...
-    [Func || {Func, _}=FuncArity <- ?MODULE:module_info(exports)
-    ,IsTestCase(FuncArity)].
+    lists:sort([Func || {Func, Arity} <- ?MODULE:module_info(exports)
+               ,Arity == 1 andalso IsInteger(Func)]).
 
 
 init_per_suite(Cfg) ->
