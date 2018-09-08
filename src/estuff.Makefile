@@ -3,7 +3,7 @@ ERL := $(shell command -v erl 2> /dev/null)
 CFG_DIR := $(CURDIR)/config
 
 ifndef ERL
-$(error "Could not found Erlang/OTP installed on this system.")
+$(error "Could not found Erlang/OTP ('erlc' command) installed on this system.")
 endif
 
 
@@ -16,9 +16,7 @@ compile:
 	@ $(REBAR) compile
 
 shell: compile
-	@ erl -pa        $(shell ls -d _build/default/lib/*/ebin) \ 
-	      -config    $(CFG_DIR)/sys.config                    \
-	      -args_file $(CFG_DIR)/vm.args
+	@ erl -pa $(shell ls -d _build/default/lib/*/ebin) -config $(CFG_DIR)/sys.config -args_file $(CFG_DIR)/vm.args -eval "catch code:load_file('{{name}}')"
 
 docs: compile
 	@ $(REBAR) as doc edoc
