@@ -2,16 +2,36 @@
 
 -setcookie {{name}}
 
+# Allow kernel-polling
 +K true
 
-+A 256
+# Number of threads in async thread pool. 
+# Valid range is 0-1024. 
+# VM default is 1.
++A 32
 
+# Sets the range of characters that the system considers printable.
+# VM default is 'latin1'.
 +pc unicode
 
-+P 1000000
+# Maximum number of simultaneously existing processes. 
+# Valid range is 1024-134217727.
+# VM default is 262144. 
++P 1048576
 
--e 65535
+# Maximum number of ETS tables.
++e 65535
 
+# Maximum number of simultaneously existing ports. 
+# Valid range is 1024-134217727.
+# VM default is normally 65535. 
 +Q 134217727
 
+# Sets the distribution buffer busy limit. 
+# Valid range is 1-2097151. 
+# VM default is 1024.
 +zdbbl 2048
+
+#-env ERL_FULLSWEEP_AFTER 10
+
+-env ERL_CRASH_DUMP {{name}}_crash.dump
