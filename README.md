@@ -7,7 +7,7 @@ Erlang rebar3 template for making new Erlang/OTP project.
 ~ $ git clone --depth=1 https://github.com/pouriya-jahanbakhsh/estuff && cd estuff
 ~/estuff $ make install
 ```
-You can also use `make uninstall`
+You can also use `make uninstall`. Note that you should replace your email in `./src/estuff.template` with my email. 
 
 
 # example
