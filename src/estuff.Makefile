@@ -1,24 +1,26 @@
 REBAR = $(CURDIR)/tools/rebar3
 ERL := $(shell command -v erl 2> /dev/null)
-
+CFG_DIR := $(CURDIR)/config
 
 ifndef ERL
-	$(error "Could not found Erlang/OTP installed on this system.")
+$(error "Could not found Erlang/OTP installed on this system.")
 endif
 
 
 .PHONY: all compile shell docs test clean distclean
 
 
-all: compile
+all: test docs
 
 compile:
 	@ $(REBAR) compile
 
-shell:
-	@ $(REBAR) shell
+shell: compile
+	@ erl -pa        $(shell ls -d _build/default/lib/*/ebin) \ 
+	      -config    $(CFG_DIR)/sys.config                    \
+	      -args_file $(CFG_DIR)/vm.args
 
-docs:
+docs: compile
 	@ $(REBAR) as doc edoc
 
 test:
