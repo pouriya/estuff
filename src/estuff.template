@@ -30,6 +30,8 @@
 
 {chmod, "{{name}}/tools/rebar3", 8#755}.
 
+{file, "estuff_user_default.erl", "{{name}}/tools/user_default.erl"}.
+
 {template, "estuff_test.erl", "{{name}}/test/{{name}}_SUITE.erl"}.
 
 {template, "estuff_include.hrl", "{{name}}/include/{{name}}.hrl"}.
