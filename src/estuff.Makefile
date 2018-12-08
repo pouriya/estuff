@@ -1,9 +1,20 @@
-REBAR                        = $(CURDIR)/tools/rebar3
-ERL                         := $(shell command -v erl 2> /dev/null)
 CFG_DIR                      = $(CURDIR)/config
-READ_COVERAGE_SUMMARY_SCRIPT = 'BEGIN {FS="[<>]"; print_headers = 0} $$2 == "tr" {if ($$7 ~ /^{{name}}/ || $$7 == "Total") {if ($$13 ~ /%$$/) {maybe_print_headers(); print $$7": " $$13}}} $$2 == "/table" {exit} function maybe_print_headers() {if (!print_headers) {print "Coverage summary:" ; print_headers = 1}}'
-COVERAGE_SUMARY_CMD          = awk $(READ_COVERAGE_SUMMARY_SCRIPT) _build/test/cover/index.html
-RELEASE_DIR                  = $(CURDIR)/_build/release/rel/{{name}}
+TOOLS_DIR                    = $(CURDIR)/tools
+REBAR                        = $(TOOLS_DIR)/rebar3
+ERL                         := $(shell command -v erl 2> /dev/null)
+RELEASE_DIR                  = $(CURDIR)/_build/default/rel/{{name}}
+VERSION                     := $(shell cat VERSION | tr -ds \n \r)
+RELEASE_NAME                 = {{name}}-$(VERSION)
+SAVE_COVERAGE                = COVERAGE_SUMMARY
+
+V    = 0
+PRE  = @
+POST = > /dev/null
+
+ifeq ($(V),1)
+PRE  =
+POST =
+endif
 
 
 ifndef ERL
@@ -11,60 +22,80 @@ $(error Could not found Erlang/OTP ('erlc' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell docs test ct dialyzer cover coverage-summary release start stop remote release-shell ping clean distclean
+.PHONY: all compile shell docs test dialyzer cover release clean distclean
 
 
-all: test docs release
+all: test docs release clean
+
 
 compile:
-	@ $(REBAR) compile
+	@ echo Compiling code
+	$(PRE) $(REBAR) compile $(POST)
+	$(PRE) cp -r $(CURDIR)/_build/default/lib/{{name}}/ebin $(CURDIR)
 
-shell: compile
-ifeq (,$(wildcard $(CURDIR)/tools/user_default.beam))
-	@ erlc -o $(CURDIR)/tools $(CURDIR)/tools/user_default.erl
+
+shell: maybe-compile-user_default
+	@ echo Compiling code
+	$(PRE) $(REBAR) compile $(POST) && \
+erl -pa $(shell ls -d _build/default/lib/*/ebin) \
+    -pz $(TOOLS_DIR) \
+    -config $(CFG_DIR)/sys.config \
+    -args_file $(CFG_DIR)/vm.args \
+    -eval "begin application:load({{name}}), catch code:load_file('{{name}}') end"
+
+
+maybe-compile-user_default:
+ifeq (,$(wildcard $(TOOLS_DIR)/user_default.beam))
+	@ echo Compiling user_default module
+	$(PRE) erlc -o $(TOOLS_DIR) $(TOOLS_DIR)/user_default.erl $(POST)
 endif
-	@ erl -pa $(shell ls -d _build/default/lib/*/ebin) -pz $(CURDIR)/tools -config $(CFG_DIR)/sys.config -args_file $(CFG_DIR)/vm.args -eval "catch code:load_file('{{name}}')"
 
-docs: compile
-	@ $(REBAR) as doc edoc
 
-test:
-	@ $(REBAR) as test do dialyzer, ct, cover
-	@ $(COVERAGE_SUMARY_CMD)
+docs:
+	@ echo Building documentation
+	$(PRE) $(REBAR) edoc $(POST)
 
-ct:
-	@ $(REBAR) as test ct
 
-dialyzer:
-	@ $(REBAR) as test dialyzer
+test: cover
 
-cover:
-	@ $(REBAR) as test ct, cover
-	@ $(COVERAGE_SUMARY_CMD)
 
-coverage-summary:
-	@ $(COVERAGE_SUMARY_CMD)
+dialyzer: compile
+	@ echo Running dialyzer
+	$(PRE) $(REBAR) dialyzer $(POST)
 
-release:
-	@ $(REBAR) as release release
 
-start:
-	@ $(RELEASE_DIR)/bin/{{name}} start
+cover: compile
+	@ echo Running tests
+	$(PRE) $(REBAR) do ct, cover $(POST)
+	@ echo Coverage summary:
+	$(PRE) awk -f $(TOOLS_DIR)/coverage_summary.awk indent="\t" \
+                  $(CURDIR)/_build/test/cover/index.html || true
+	$(PRE) awk -f $(TOOLS_DIR)/coverage_summary.awk \
+                  indent="" \
+                  pre_name="" \
+                  post_name="" \
+                  pre_low_percentage="" \
+                  post_low_percentage="" \
+                  pre_normal_percentage="" \
+                  post_normal_percentage="" \
+                  pre_high_percentage="" \
+                  post_high_percentage="" \
+                  $(CURDIR)/_build/test/cover/index.html \
+                  > $(SAVE_COVERAGE) || true
 
-stop:
-	@ $(RELEASE_DIR)/bin/{{name}} stop
 
-remote:
-	@ $(RELEASE_DIR)/bin/{{name}} remote_console
+release: compile
+	@ echo Building release $(RELEASE_NAME)
+	$(PRE) $(REBAR) release $(POST)
+	$(PRE) mkdir -p $(CURDIR)/$(RELEASE_NAME) $(POST)
+	$(PRE) cp -r $(RELEASE_DIR)/* $(CURDIR)/$(RELEASE_NAME) $(POST)
+	$(PRE) tar -zcvf $(RELEASE_NAME).tar.gz --absolute-names $(CURDIR)/$(RELEASE_NAME) $(POST)
 
-release-shell:
-	@ $(RELEASE_DIR)/bin/{{name}} console
-
-ping:
-	@ $(RELEASE_DIR)/bin/{{name}} ping
 
 clean:
-	@ $(REBAR) clean
+	@ echo Cleaning out
+	$(PRE) $(REBAR) clean $(POST)
+
 
 distclean: clean
-	@ rm -rf _build rebar.lock doc
+	$(PRE) rm -rf _build rebar.lock doc $(RELEASE_NAME)* ebin $(POST)
