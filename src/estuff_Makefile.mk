@@ -53,7 +53,7 @@ endif
 
 docs:
 	@ echo Building documentation
-	$(PRE) $(REBAR) edoc $(POST)
+	$(PRE) $(REBAR) as doc edoc $(POST)
 
 
 test: cover
@@ -61,12 +61,12 @@ test: cover
 
 dialyzer: compile
 	@ echo Running dialyzer
-	$(PRE) $(REBAR) dialyzer $(POST)
+	$(PRE) $(REBAR) as test dialyzer $(POST)
 
 
 cover: compile
 	@ echo Running tests
-	$(PRE) $(REBAR) do ct, cover $(POST)
+	$(PRE) $(REBAR) as test do ct, cover $(POST)
 	@ echo Coverage summary:
 	$(PRE) awk -f $(TOOLS_DIR)/coverage_summary.awk indent="\t" \
                   $(CURDIR)/_build/test/cover/index.html || true
