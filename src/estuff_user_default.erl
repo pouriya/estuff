@@ -1,5 +1,5 @@
 -module(user_default).
--export([c/0, r/0, cr/0]).
+-export([c/0, r/0, cr/0, cl/0, test/0]).
 
 
 c() ->
@@ -14,6 +14,16 @@ r() ->
 cr() ->
     c(),
     r().
+
+
+cl() ->
+    io:format("\033[2J\033[u").
+
+
+test() ->
+    Result = file:script("./test/shell_quick_test.script"),
+    io:nl(),
+    Result.
 
 
 erlang_source_files() ->
