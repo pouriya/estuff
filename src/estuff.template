@@ -10,23 +10,23 @@
 
 {template, "estuff_sup.erl", "{{name}}/src/{{name}}_sup.erl"}.
 
-{template, "estuff.app.src", "{{name}}/src/{{name}}.app.src"}.
+{template, "estuff_app.src", "{{name}}/src/{{name}}.app.src"}.
 
 {template, "estuff_utils.erl", "{{name}}/src/{{name}}_utils.erl"}.
 
-{template, "estuff.rebar.config", "{{name}}/rebar.config"}.
+{template, "estuff_rebar.config", "{{name}}/rebar.config"}.
 
-{template, "estuff.sys.config", "{{name}}/config/sys.config"}.
+{template, "estuff_sys.config", "{{name}}/config/sys.config"}.
 
-{template, "estuff.vm.args", "{{name}}/config/vm.args"}.
+{template, "estuff_vm.args", "{{name}}/config/vm.args"}.
 
-{template, "estuff.LICENSE", "{{name}}/LICENSE"}.
+{template, "estuff_LICENSE", "{{name}}/LICENSE"}.
 
-{template, "estuff.README.md", "{{name}}/README.md"}.
+{template, "estuff_README.md", "{{name}}/README.md"}.
 
-{template, "estuff.Makefile", "{{name}}/Makefile"}.
+{template, "estuff_Makefile.mk", "{{name}}/Makefile"}.
 
-{file, "estuff.rebar3", "{{name}}/tools/rebar3"}.
+{file, "estuff_rebar3", "{{name}}/tools/rebar3"}.
 
 {chmod, "{{name}}/tools/rebar3", 8#755}.
 
@@ -35,3 +35,9 @@
 {template, "estuff_test.erl", "{{name}}/test/{{name}}_SUITE.erl"}.
 
 {template, "estuff_include.hrl", "{{name}}/include/{{name}}.hrl"}.
+
+{template, "estuff_coverage_summary.awk", "{{name}}/tools/coverage_summary.awk"}.
+
+{file, "estuff_VERSION", "{{name}}/VERSION"}.
+
+{template, "estuff_shell_quick_test.script", "{{name}}/test/shell_quick_test.script"}.
