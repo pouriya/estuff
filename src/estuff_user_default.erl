@@ -23,6 +23,7 @@ cl() ->
 
 
 test() ->
+    io:format("Running ./test/shell_quick_test.script\n"),
     Result = file:script("./test/shell_quick_test.script"),
     io:nl(),
     Result.

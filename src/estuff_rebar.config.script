@@ -1,0 +1,104 @@
+NameUpper = string:to_upper("{{name}}").
+
+BuildType = 
+    case os:getenv(NameUpper ++ "_BUILD") of
+        false ->
+            default;
+        BuildTypeX ->
+            erlang:list_to_atom(string:to_lower(BuildTypeX))
+    end.
+
+
+Version =
+    case os:getenv(NameUpper ++ "VERSION") of
+        false ->
+            "0.0.0";
+        VersionX ->
+            VersionX
+    end.
+
+
+Release =
+    fun() ->
+        [
+         {relx, [
+                 {release, {{{name}}, Version}
+                ,[{sasl, load}, {{name}}]}
+                ,{include_erts, true}
+                ,{include_src, false}
+                ,{dev_mode, false}
+                ,{generate_start_script, true}
+                ,{extended_start_script, true}
+                ,{sys_config, "./config/sys.config"}
+                ,{vm_args, "./config/vm.args"}
+                ]
+         }
+        ]
+    end.
+
+
+Dialyzer =
+    fun() ->
+        [{dialyzer, [
+                     {warnings, [no_return]}
+                    ,{plt_apps, top_level_deps}
+                    ,{plt_prefix, "{{name}}"}
+                    ]
+         }
+        ]
+    end.
+
+
+Test = 
+    fun() ->
+        [
+         {cover_enabled, true}
+        ,{cover_print_enabled, true}
+        ,{cover_export_enabled, true}
+        ]
+    end.
+
+
+Docs = 
+    fun() ->
+        [{edoc_opts, []}]
+    end.
+
+
+Shell = 
+    fun() ->
+        []
+    end.
+
+
+Default = 
+    fun() ->
+        []
+    end.
+
+
+Cfg =
+    []
+    ++
+    case BuildType of
+        release ->
+            Release();
+        dialyzer ->
+            Dialyzer();
+        test ->
+            Test() ++ Dialyzer();
+        docs ->
+            Docs();
+        shell -> 
+            Shell();
+        _ -> % default: Used as dependency
+            Default()
+    end
+    ++
+    CONFIG
+    ++
+    [].
+
+%io:format("~p\n", [Cfg]).
+
+Cfg.

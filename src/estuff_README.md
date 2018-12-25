@@ -1,11 +1,15 @@
 # `{{name}}`
 {{discription}}
 
-## features
+## Features
 
 
 ## Build
+```sh
+~ $ git clone --depth 1 GIT_ADDRESS && cd {{name}}
+...
+~/{{name}} $ make
+```
 
-
-### Author
+#### Author
 `{{author}}`

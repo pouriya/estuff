@@ -1,0 +1,28 @@
+FROM erlang:alpine
+
+RUN apk add make git
+
+RUN mkdir -p /buildroot/{{name}}
+WORKDIR /buildroot/{{name}}
+
+COPY src           .
+COPY include       .
+COPY config        .
+COPY tools         .
+COPY Makefile      .
+COPY rebar.config* .
+COPY VERSION       .
+
+RUN make release v=1
+
+FROM alpine
+
+RUN apk add openssl ncurses-libs
+
+RUN VERSION=$(cat VERSION) && export {{name}}_VERSION=$VERSION
+COPY --from=0 {{name}}-${{name}}_VERSION /{{name}}
+
+WORKDIR /
+RUN rm -rf /buildroot
+
+CMD ["/{{name}}/bin/{{name}}", "foreground"]

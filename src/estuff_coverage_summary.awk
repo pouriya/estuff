@@ -7,16 +7,19 @@ BEGIN {
     FS = "[<>]"
 
     indent = ""
-    pre_name  = "\033[0;34m"
+    pre_name  = "\033[1;34m" # Light blue
     post_name = "\033[0m"
 
-    pre_low_percentage  = "\033[0;31m"
+    pre_no_test_percentage = "\033[1;30m" # Dark gray
+    post_not_test_percentage = "\033[0m"
+
+    pre_low_percentage  = "\033[0;31m" # Red
     post_low_percentage = "\033[0m"
 
-    pre_normal_percentage  = "\033[0;33m"
+    pre_normal_percentage  = "\033[0;33m" # Orange
     post_normal_percentage = "\033[0m"
 
-    pre_high_percentage  = "\033[0;32m"
+    pre_high_percentage  = "\033[0;32m" # Green
     post_high_percentage = "\033[0m"
 
     format = "%s%s%-40s%s%s%-3s%s %s%%%s"
@@ -25,10 +28,13 @@ BEGIN {
 
 $2 == "tr" && ($7 ~ /^{{name}}/ || $7 == "Total") && $13 ~ /%$$/ {
     number = int(substr($13, 1, length($13)-1))
-    if (number < 50) {
+    if (number < 15) {
+        pre_percentage  = pre_no_test_percentage
+        post_percentage = post_no_test_percentage
+    } else if (number < 50) {
         pre_percentage  = pre_low_percentage
         post_percentage = post_low_percentage
-    } else if (number < 85) {
+    } else if (number < 75) {
         pre_percentage  = pre_normal_percentage
         post_percentage = post_normal_percentage
     } else {

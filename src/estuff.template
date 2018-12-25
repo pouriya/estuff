@@ -1,7 +1,7 @@
 {description, "OTP Application."}.
 
-{variables, [{name, "mylib", "Name of the OTP application"}
-            ,{author, "pouriya.jahanbakhsh@gmail.com", "Author's email of this application."}
+{variables, [{name, "estuff", "Name of the OTP application"}
+            ,{author, "pouriya.jahanbakhsh@gmail.com", "Author's email for this application."}
             ,{description, "An OTP application", "One line description for this application."}]}.
 
 {template, "estuff.erl", "{{name}}/src/{{name}}.erl"}.
@@ -15,6 +15,8 @@
 {template, "estuff_utils.erl", "{{name}}/src/{{name}}_utils.erl"}.
 
 {template, "estuff_rebar.config", "{{name}}/rebar.config"}.
+
+{template, "estuff_rebar.config.script", "{{name}}/rebar.config.script"}.
 
 {template, "estuff_sys.config", "{{name}}/config/sys.config"}.
 
@@ -41,3 +43,5 @@
 {file, "estuff_VERSION", "{{name}}/VERSION"}.
 
 {template, "estuff_shell_quick_test.script", "{{name}}/test/shell_quick_test.script"}.
+
+{template, "estuff_Dockerfile", "{{name}}/Dockerfile"}.

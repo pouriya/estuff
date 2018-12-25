@@ -8,12 +8,15 @@ RELEASE_DIR                  = $(CURDIR)/_build/default/rel/{{name}}
 VERSION                     := $(shell cat VERSION | tr -ds \n \r)
 RELEASE_NAME                 = {{name}}-$(VERSION)
 SAVE_COVERAGE                = COVERAGE_SUMMARY
+NAME_UPPER                  := $(shell echo {{name}} | awk '{print toupper($$1)}')
 
-V    = 0
+debug = # Used for rebar3
+
+v    = 0
 PRE  = @
 POST = > /dev/null
 
-ifeq ($(V),1)
+ifeq ($(v),1)
 PRE  =
 POST =
 endif
@@ -24,26 +27,35 @@ $(error Could not found Erlang/OTP ('erlc' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell docs test dialyzer cover release clean distclean
+.PHONY: all compile shell docs test dialyzer cover release tar clean distclean docker
 
 
-all: test docs release clean
+all: test docs release
 
 
 compile:
 	@ echo Compiling code
-	$(PRE) $(REBAR) compile $(POST)
+	$(PRE)                                    \
+            export $(NAME_UPPER)_BUILD=COMPILE && \
+            export DEBUG=$(debug)              && \
+            $(REBAR) compile                      \
+        $(POST)
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/{{name}}/ebin $(CURDIR)
 
 
 shell: maybe-compile-user_default
 	@ echo Compiling code
-	$(PRE) $(REBAR) compile $(POST) && \
-erl -pa $(shell ls -d _build/default/lib/*/ebin) \
-    -pz $(TOOLS_DIR) \
-    -config $(CFG_DIR)/sys.config \
-    -args_file $(CFG_DIR)/vm.args \
-    -eval "begin application:load({{name}}), catch code:load_file('{{name}}') end"
+	$(PRE)                                  \
+            export $(NAME_UPPER)_BUILD=SHELL && \
+            export DEBUG=$(debug)            && \
+            $(REBAR) compile                    \
+        $(POST)
+	$(PRE)                                               \
+            erl -pa $(shell ls -d _build/default/lib/*/ebin) \
+                -pz $(TOOLS_DIR)                             \
+                -config $(CFG_DIR)/sys.config                \
+                -args_file $(CFG_DIR)/vm.args                \
+                -eval "begin application:load('{{name}}'), catch code:load_file('{{name}}') end"
 
 
 maybe-compile-user_default:
@@ -55,7 +67,11 @@ endif
 
 docs:
 	@ echo Building documentation
-	$(PRE) $(REBAR) as doc edoc $(POST)
+	$(PRE)                                \
+            export $(NAME_UPPER)_BUILD=DOC && \
+            export DEBUG=$(debug)          && \
+            $(REBAR) edoc                     \
+        $(POST)
 
 
 test: cover
@@ -63,41 +79,67 @@ test: cover
 
 dialyzer: compile
 	@ echo Running dialyzer
-	$(PRE) $(REBAR) as test dialyzer $(POST)
+	$(PRE)                                     \
+            export $(NAME_UPPER)_BUILD=DIALYZER && \
+            export DEBUG=$(debug)               && \
+            $(REBAR) dialyzer                      \
+        $(POST)
 
 
 cover: compile
 	@ echo Running tests
-	$(PRE) $(REBAR) as test do ct, cover $(POST)
+	$(PRE)                                 \
+            export $(NAME_UPPER)_BUILD=TEST && \
+            export DEBUG=$(debug)           && \
+            $(REBAR) do ct, cover              \
+        $(POST)
 	@ echo Coverage summary:
-	$(PRE) awk -f $(TOOLS_DIR)/coverage_summary.awk indent="\t" \
-                  $(CURDIR)/_build/test/cover/index.html || true
-	$(PRE) awk -f $(TOOLS_DIR)/coverage_summary.awk \
-                  indent="" \
-                  pre_name="" \
-                  post_name="" \
-                  pre_low_percentage="" \
-                  post_low_percentage="" \
-                  pre_normal_percentage="" \
-                  post_normal_percentage="" \
-                  pre_high_percentage="" \
-                  post_high_percentage="" \
-                  $(CURDIR)/_build/test/cover/index.html \
-                  > $(SAVE_COVERAGE) || true
+	$(PRE) \
+            awk -f $(TOOLS_DIR)/coverage_summary.awk   \
+                indent="\t"                            \
+                $(CURDIR)/_build/test/cover/index.html \
+            || true
+	$(PRE)                                            \
+            awk -f $(TOOLS_DIR)/coverage_summary.awk      \
+                   indent=""                              \
+                   pre_name=""                            \
+                   post_name=""                           \
+                   pre_no_test_percentage=""              \
+                   post_no_test_percentage=""             \
+                   pre_low_percentage=""                  \
+                   post_low_percentage=""                 \
+                   pre_normal_percentage=""               \
+                   post_normal_percentage=""              \
+                   pre_high_percentage=""                 \
+                   post_high_percentage=""                \
+                   $(CURDIR)/_build/test/cover/index.html \
+            > $(SAVE_COVERAGE) || true
 
 
 release: compile
 	@ echo Building release $(RELEASE_NAME)
-	$(PRE) $(REBAR) release $(POST)
+	$(PRE)                                    \
+            export $(NAME_UPPER)_BUILD=RELEASE && \
+            export DEBUG=$(debug)              && \
+            $(REBAR) release                      \
+        $(POST)
 	$(PRE) mkdir -p $(CURDIR)/$(RELEASE_NAME) $(POST)
 	$(PRE) cp -r $(RELEASE_DIR)/* $(CURDIR)/$(RELEASE_NAME) $(POST)
-	$(PRE) tar -zcvf $(RELEASE_NAME).tar.gz --absolute-names $(CURDIR)/$(RELEASE_NAME) $(POST)
+
+
+tar: release
+	$(PRE) tar -zcvf $(RELEASE_NAME).tar.gz $(CURDIR)/$(RELEASE_NAME) $(POST)
 
 
 clean:
 	@ echo Cleaning out
 	$(PRE) $(REBAR) clean $(POST)
+	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
 
 
 distclean: clean
 	$(PRE) rm -rf _build rebar.lock doc $(RELEASE_NAME)* ebin $(POST)
+
+
+docker:
+	$(PRE) docker build -t {{name}} ./ $(POST)
