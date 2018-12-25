@@ -12,7 +12,9 @@ BuildType =
 Version =
     case os:getenv(NameUpper ++ "VERSION") of
         false ->
-            "0.0.0";
+            {Y, Mo, D} = erlang:date(),
+            {H, Mi, S} = erlang:time(),
+            lists:flatten(io_lib:format("~p.~p.~p.~p.~p.~p", [Y, Mo, D, H, Mi, S]));
         VersionX ->
             VersionX
     end.
@@ -20,60 +22,38 @@ Version =
 
 Release =
     fun() ->
-        [
-         {relx, [
-                 {release, {{{name}}, Version}
-                ,[{sasl, load}, {{name}}]}
-                ,{include_erts, true}
-                ,{include_src, false}
-                ,{dev_mode, false}
-                ,{generate_start_script, true}
-                ,{extended_start_script, true}
-                ,{sys_config, "./config/sys.config"}
-                ,{vm_args, "./config/vm.args"}
-                ]
-         }
-        ]
+        {_, {_, RelXOpts}, Cfg2} = lists:keytake(relx, 1, CONFIG),
+        [{relx, [{release, {{{name}}, Version}, [{sasl, load}, {{name}}]} | RelXOpts]} | Cfg2]
     end.
 
 
 Dialyzer =
     fun() ->
-        [{dialyzer, [
-                     {warnings, [no_return]}
-                    ,{plt_apps, top_level_deps}
-                    ,{plt_prefix, "{{name}}"}
-                    ]
-         }
-        ]
+        CONFIG
     end.
 
 
 Test = 
     fun() ->
-        [
-         {cover_enabled, true}
-        ,{cover_print_enabled, true}
-        ,{cover_export_enabled, true}
-        ]
+        CONFIG
     end.
 
 
 Docs = 
     fun() ->
-        [{edoc_opts, []}]
+        CONFIG
     end.
 
 
 Shell = 
     fun() ->
-        []
+        CONFIG
     end.
 
 
 Default = 
     fun() ->
-        []
+        CONFIG
     end.
 
 
@@ -86,7 +66,7 @@ Cfg =
         dialyzer ->
             Dialyzer();
         test ->
-            Test() ++ Dialyzer();
+            Test();
         docs ->
             Docs();
         shell -> 
@@ -94,8 +74,6 @@ Cfg =
         _ -> % default: Used as dependency
             Default()
     end
-    ++
-    CONFIG
     ++
     [].
 
