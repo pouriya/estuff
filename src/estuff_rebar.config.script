@@ -10,7 +10,7 @@ BuildType =
 
 
 Version =
-    case os:getenv(NameUpper ++ "VERSION") of
+    case os:getenv(NameUpper ++ "_VERSION") of
         false ->
             {Y, Mo, D} = erlang:date(),
             {H, Mi, S} = erlang:time(),
