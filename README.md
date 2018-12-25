@@ -57,9 +57,9 @@ module_info/0  module_info/1  start/0        stop/0
 You can edit project files and recompile/reload all files without restarting shell:
 ```erlang
 (foo@localhost)1> cr(). % use c() to just compile them and use r() to just reload them
-make[1]: Entering directory '/p/foo'
+make[1]: Entering directory '~/foo'
 Compiling code
-make[1]: Leaving directory '/p/foo'
+make[1]: Leaving directory '~/foo'
 Reloading foo
 Reloading foo_app
 Reloading foo_sup
@@ -69,7 +69,7 @@ ok
 
 You can use `cl().` to clean the screen, I tested it on FreeBSD and Linux:
 ```erlang
-pouriya@codefather /p/foo $ make shell 
+~/foo $ make shell 
 Compiling code
 Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:256] [hipe] [kernel-poll:true]
 
