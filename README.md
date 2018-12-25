@@ -69,19 +69,19 @@ ok
 
 You can use `cl().` to clean the screen, I tested it on FreeBSD and Linux:
 ```erlang
-~/foo $ make shell 
-Compiling code
-Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:256] [hipe] [kernel-poll:true]
 
-Eshell V9.3  (abort with ^G)
-(foo@localhost)1> foo:
-module_info/0  module_info/1  start/0        stop/0         
+
+
+
+
+
+
+
 % above commands
 (foo@localhost)2> cl().
 ```
 Will be:
 ```erlang
-ok
 (foo@localhost)3>
 
 
