@@ -54,7 +54,7 @@ Module `foo` is loaded in  shell:
 module_info/0  module_info/1  start/0        stop/0
 ```
 
-You can edit project's file and recompile/reload all files without restarting shell:
+You can edit project files and recompile/reload all files without restarting shell:
 ```erlang
 (foo@localhost)1> cr(). % use c() to just compile them and use r() to just reload them
 make[1]: Entering directory '/p/foo'
@@ -144,8 +144,8 @@ Use make tar to generate `foo-0.0.0.tar.gz`
 `docker`: Builds docker image for project's release. At the time I did not test it.  
 
 
-# Debug
-If something goes wrong in code, config, etc. `make <target>` does not shows actuall error by default:
+# make options
+If something goes wrong in code, config, etc. `make <target>` does not show actuall error by default:
 ```sh
 ~/foo $ echo unknown config >> rebar.config
 
