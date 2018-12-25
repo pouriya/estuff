@@ -7,19 +7,28 @@ ERL                         := $(shell command -v erl 2> /dev/null)
 RELEASE_DIR                  = $(CURDIR)/_build/default/rel/{{name}}
 VERSION                     := $(shell cat VERSION | tr -ds \n \r)
 RELEASE_NAME                 = {{name}}-$(VERSION)
-SAVE_COVERAGE                = COVERAGE_SUMMARY
 NAME_UPPER                  := $(shell echo {{name}} | awk '{print toupper($$1)}')
 
-debug = # Used for rebar3
-
-v    = 0
 PRE  = @
 POST = > /dev/null
 
+v = 0
 ifeq ($(v),1)
 PRE  =
 POST =
 endif
+
+debug = # Used for rebar3
+ifeq ($(debug),1)
+PRE  =
+POST =
+endif
+
+coverage = 0
+ifeq ($(coverage),0)
+coverage = /dev/null
+endif
+
 
 
 ifndef ERL
@@ -35,20 +44,22 @@ all: test docs release
 
 compile:
 	@ echo Compiling code
-	$(PRE)                                    \
-            export $(NAME_UPPER)_BUILD=COMPILE && \
-            export DEBUG=$(debug)              && \
-            $(REBAR) compile                      \
+	$(PRE)                                         \
+            export $(NAME_UPPER)_BUILD=COMPILE      && \
+            export DEBUG=$(debug)                   && \
+            export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            $(REBAR) compile                           \
         $(POST)
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/{{name}}/ebin $(CURDIR)
 
 
 shell: maybe-compile-user_default
 	@ echo Compiling code
-	$(PRE)                                  \
-            export $(NAME_UPPER)_BUILD=SHELL && \
-            export DEBUG=$(debug)            && \
-            $(REBAR) compile                    \
+	$(PRE)                                         \
+            export $(NAME_UPPER)_BUILD=SHELL        && \
+            export DEBUG=$(debug)                   && \
+            export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            $(REBAR) compile                           \
         $(POST)
 	$(PRE)                                               \
             erl -pa $(shell ls -d _build/default/lib/*/ebin) \
@@ -67,10 +78,11 @@ endif
 
 docs:
 	@ echo Building documentation
-	$(PRE)                                \
-            export $(NAME_UPPER)_BUILD=DOC && \
-            export DEBUG=$(debug)          && \
-            $(REBAR) edoc                     \
+	$(PRE)                                         \
+            export $(NAME_UPPER)_BUILD=DOC          && \
+            export DEBUG=$(debug)                   && \
+            export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            $(REBAR) edoc                              \
         $(POST)
 
 
@@ -79,19 +91,21 @@ test: cover
 
 dialyzer: compile
 	@ echo Running dialyzer
-	$(PRE)                                     \
-            export $(NAME_UPPER)_BUILD=DIALYZER && \
-            export DEBUG=$(debug)               && \
-            $(REBAR) dialyzer                      \
+	$(PRE)                                         \
+            export $(NAME_UPPER)_BUILD=DIALYZER     && \
+            export DEBUG=$(debug)                   && \
+            export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            $(REBAR) dialyzer                          \
         $(POST)
 
 
 cover: compile
 	@ echo Running tests
-	$(PRE)                                 \
-            export $(NAME_UPPER)_BUILD=TEST && \
-            export DEBUG=$(debug)           && \
-            $(REBAR) do ct, cover              \
+	$(PRE)                                         \
+            export $(NAME_UPPER)_BUILD=TEST         && \
+            export DEBUG=$(debug)                   && \
+            export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            $(REBAR) do ct, cover                      \
         $(POST)
 	@ echo Coverage summary:
 	$(PRE) \
@@ -113,15 +127,16 @@ cover: compile
                    pre_high_percentage=""                 \
                    post_high_percentage=""                \
                    $(CURDIR)/_build/test/cover/index.html \
-            > $(SAVE_COVERAGE) || true
+            > $(coverage) || true
 
 
 release: compile
 	@ echo Building release $(RELEASE_NAME)
-	$(PRE)                                    \
-            export $(NAME_UPPER)_BUILD=RELEASE && \
-            export DEBUG=$(debug)              && \
-            $(REBAR) release                      \
+	$(PRE)                                         \
+            export $(NAME_UPPER)_BUILD=RELEASE      && \
+            export DEBUG=$(debug)                   && \
+            export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            $(REBAR) release                           \
         $(POST)
 	$(PRE) mkdir -p $(CURDIR)/$(RELEASE_NAME) $(POST)
 	$(PRE) cp -r $(RELEASE_DIR)/* $(CURDIR)/$(RELEASE_NAME) $(POST)
