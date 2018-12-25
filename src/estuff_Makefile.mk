@@ -9,8 +9,9 @@ VERSION                     := $(shell cat VERSION | tr -ds \n \r)
 RELEASE_NAME                 = {{name}}-$(VERSION)
 NAME_UPPER                  := $(shell echo {{name}} | awk '{print toupper($$1)}')
 
-PRE  = @
-POST = > /dev/null
+PRE         = @
+POST        = > /dev/null
+REBAR_DEBUG =
 
 v = 0
 ifeq ($(v),1)
@@ -18,10 +19,10 @@ PRE  =
 POST =
 endif
 
-debug = # Used for rebar3
-ifeq ($(debug),1)
-PRE  =
-POST =
+ifeq ($(v),2)
+PRE         =
+POST        =
+REBAR_DEBUG = 1
 endif
 
 coverage = 0
@@ -46,7 +47,7 @@ compile:
 	@ echo Compiling code
 	$(PRE)                                         \
             export $(NAME_UPPER)_BUILD=COMPILE      && \
-            export DEBUG=$(debug)                   && \
+            export DEBUG=$(REBAR_DEBUG)             && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
             $(REBAR) compile                           \
         $(POST)
@@ -57,7 +58,7 @@ shell: maybe-compile-user_default
 	@ echo Compiling code
 	$(PRE)                                         \
             export $(NAME_UPPER)_BUILD=SHELL        && \
-            export DEBUG=$(debug)                   && \
+            export DEBUG=$(REBAR_DEBUG)             && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
             $(REBAR) compile                           \
         $(POST)
@@ -80,7 +81,7 @@ docs:
 	@ echo Building documentation
 	$(PRE)                                         \
             export $(NAME_UPPER)_BUILD=DOC          && \
-            export DEBUG=$(debug)                   && \
+            export DEBUG=$(REBAR_DEBUG)             && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
             $(REBAR) edoc                              \
         $(POST)
@@ -93,7 +94,7 @@ dialyzer: compile
 	@ echo Running dialyzer
 	$(PRE)                                         \
             export $(NAME_UPPER)_BUILD=DIALYZER     && \
-            export DEBUG=$(debug)                   && \
+            export DEBUG=$(REBAR_DEBUG)             && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
             $(REBAR) dialyzer                          \
         $(POST)
@@ -103,7 +104,7 @@ cover: compile
 	@ echo Running tests
 	$(PRE)                                         \
             export $(NAME_UPPER)_BUILD=TEST         && \
-            export DEBUG=$(debug)                   && \
+            export DEBUG=$(REBAR_DEBUG)             && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
             $(REBAR) do ct, cover                      \
         $(POST)
@@ -134,7 +135,7 @@ release: compile
 	@ echo Building release $(RELEASE_NAME)
 	$(PRE)                                         \
             export $(NAME_UPPER)_BUILD=RELEASE      && \
-            export DEBUG=$(debug)                   && \
+            export DEBUG=$(REBAR_DEBUG)             && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
             $(REBAR) release                           \
         $(POST)
