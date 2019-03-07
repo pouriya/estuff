@@ -43,7 +43,8 @@ You can also use `make uninstall`. Note that you should replace your email in `.
 ```sh
 ~/foo $ make shell
 Compiling user_default module
-Compiling code
+===> Verifying dependencies...
+===> Compiling foo
 Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:256] [hipe] [kernel-poll:true]
 Eshell V9.3  (abort with ^G)
 (foo@localhost)1>
@@ -130,48 +131,25 @@ Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:
 Eshell V9.3  (abort with ^G)
 (foo@localhost)1>
 ```
-Use make tar to generate `foo-0.0.0.tar.gz`
+Use `make package` to generate `foo-0.0.0.tar.gz`
 
 
 ## Other make targets
-`all`: Compiles, Runs tests, Shows coverage summary and builds release.  
+`all`: Compiles, Runs tests, Shows coverage summary and builds release package.  
 `compile`: Compiles code.  
 `dialyzer`: Runs dialyzer for this project.  
 `cover`: Same as `test`.  
 `docs`: Makes `edoc` for this project.  
 `clean`: Runs `rebar3 clean`.  
-`distclean`: Runs `rebar3 clean` and removes `rebar.lock`, created release directory, `./ebin` directory, `./docs` directory, etc.  
+`distclean`: Runs `rebar3 clean` and removes `rebar.lock`, created release directory, `./ebin` directory, etc.  
+`push`: Runs tests and runs `git push origin master` if test passed.  
 `docker`: Builds docker image for project's release. At the time I did not test it.  
-
+`tar`: Builds a zip file containing all project's files.  
 
 # make options
-If something goes wrong in code, config, etc. `make <target>` does not show actuall error by default:
+By default its verbosity is `1`. Use `v=2` to enable `rebar3` debug too:  
 ```sh
-~/foo $ echo unknown config >> rebar.config
-
-~/foo $ make compile
-Compiling code
-Makefile:46: recipe for target 'compile' failed
-make: *** [compile] Error 1
-```
-
-So you need to use `v` option to make it verbose:  
-```sh
-~/foo $ make compile v=1
-Compiling code
-                                        \
-            export FOO_BUILD=COMPILE && \
-            export DEBUG=            && \
-            export FOO_VERSION=0.0.0 && \
-            ~/foo/tools/rebar3 compile  \
-===> Error reading file rebar.config: syntax error before: config
-Makefile:46: recipe for target 'compile' failed
-make: *** [compile] Error 1
-```
-
-You can use `2` to enable `rebar3` debug too:  
-```sh
-~/foo $ make compile v=2 # fix above error first
+~/foo $ make compile v=2
 Compiling code
                                         \
             export FOO_BUILD=COMPILE && \
@@ -188,39 +166,14 @@ Compiling code
 ===> Provider: {default,app_discovery}
 ===> Evaluating config script "~/foo/rebar.config.script"
 ===> Evaluating config script "~/foo/rebar.config.script"
-===> Evaluating config script "~/foo/rebar.config.script"
-===> Provider: {default,install_deps}
-===> Verifying dependencies...
-===> Provider: {default,lock}
-===> Provider: {default,compile}
-===> run_hooks("~/foo", pre_hooks, compile) -> no hooks defined
 
-===> Compiling foo
-===> run_hooks("~/foo", pre_hooks, compile) -> no hooks defined
 
-===> run_hooks("~/foo", pre_hooks, erlc_compile) -> no hooks defined
+### Lots of Rebar debug info
 
-===> erlopts [debug_info]
-===> files to compile ["~/foo/_build/default/lib/foo/src/foo_app.erl",
-                              "~/foo/_build/default/lib/foo/src/foo.erl",
-                              "~/foo/_build/default/lib/foo/src/foo_utils.erl",
-                              "~/foo/_build/default/lib/foo/src/foo_sup.erl"]
-===>      Compiled foo_app.erl
-===>      Compiled foo.erl
-===>      Compiled foo_utils.erl
-===>      Compiled foo_sup.erl
-===> run_hooks("~/foo", post_hooks, erlc_compile) -> no hooks defined
-
-===> run_hooks("~/foo", pre_hooks, app_compile) -> no hooks defined
-
-===> run_hooks("~/foo", post_hooks, app_compile) -> no hooks defined
-
-===> run_hooks("~/foo", post_hooks, compile) -> no hooks defined
-
-===> run_hooks("~/foo", post_hooks, compile) -> no hooks defined
 
 cp -r ~/foo/_build/default/lib/foo/ebin ~/foo
 ```
+Also you can use `v=0` to see less information.  
 
 If you want to save coverage summary in file, use `coverage` option:
 ```sh
