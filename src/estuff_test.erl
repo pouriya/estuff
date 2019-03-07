@@ -1,3 +1,4 @@
+%% {{header_comment}}
 %% -----------------------------------------------------------------------------
 -module({{name}}_SUITE).
 -author('{{author}}').
@@ -34,19 +35,24 @@
 
 
 all() ->
-    IsInteger =
-        fun(Func) ->
-            try
-                _ = erlang:list_to_integer(erlang:atom_to_list(Func)),
-                true
-            catch
-                _:_ ->
-                    false
-            end
+    ToInteger =
+        fun
+            ({Func, 1}) ->
+                try
+                    erlang:list_to_integer(erlang:atom_to_list(Func))
+                catch
+                    _:_ ->
+                        0
+                end;
+            (_) -> % Arity > 1 | Arity == 0
+                0
         end,
+    % contains 0 for other functions:
+    Ints = [ToInteger(X) || X <- ?MODULE:module_info(exports)],
+    % 1, 2, ...
+    PosInts = lists:sort([Int || Int <- Ints, Int > 0]),
     % '1', '2', ...
-    lists:sort([Func || {Func, Arity} <- ?MODULE:module_info(exports)
-               ,Arity == 1 andalso IsInteger(Func)]).
+    [erlang:list_to_atom(erlang:integer_to_list(X)) || X <- PosInts].
 
 
 init_per_suite(Cfg) ->

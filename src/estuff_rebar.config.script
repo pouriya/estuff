@@ -1,3 +1,5 @@
+% {{header_comment}}
+
 NameUpper = string:to_upper("{{name}}").
 
 BuildType = 

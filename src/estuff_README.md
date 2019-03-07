@@ -6,7 +6,7 @@
 
 ## Build
 ```sh
-~ $ git clone --depth 1 GIT_ADDRESS && cd {{name}}
+~ $ git clone --depth 1 git/address/of/{{name}} && cd {{name}}
 ...
 ~/{{name}} $ make
 ```
