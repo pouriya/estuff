@@ -145,6 +145,7 @@ Use `make package` to generate `foo-0.0.0.tar.gz`
 `push`: Runs tests and runs `git push origin master` if test passed.  
 `docker`: Builds docker image for project's release. At the time I did not test it.  
 `tar`: Builds a zip file containing all project's files.  
+`package`: Builds a zip file containing release.  
 
 # make options
 By default its verbosity is `1`. Use `v=2` to enable `rebar3` debug too:  
