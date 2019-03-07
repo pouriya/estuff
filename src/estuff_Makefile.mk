@@ -139,7 +139,7 @@ clean:
 
 
 distclean: clean
-	$(PRE) rm -rf _build rebar.lock doc $(RELEASE_NAME)* ebin $(POST)
+	$(PRE) rm -rf _build rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz {{name}}.tar.gz ebin tools/user_default.beam $(POST)
 
 
 docker:
