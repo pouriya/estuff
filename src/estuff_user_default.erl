@@ -30,7 +30,7 @@ test() ->
 
 
 erlang_source_files() ->
-    {ok, SrcFiles} = file:list_dir("src"),
+    SrcFiles = filelib:wildcard("**/*.erl", "src"),
     lists:filter(fun is_erlang_source_file/1, SrcFiles).
 
 
