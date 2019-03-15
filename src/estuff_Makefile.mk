@@ -11,6 +11,7 @@ NAME_UPPER  := $(shell echo {{name}} | awk '{print toupper($$1)}')
 
 PRE         = @
 POST        =
+BUILD_DEBUG = 0
 REBAR_DEBUG =
 
 v = 1
@@ -19,7 +20,17 @@ POST = > /dev/null
 endif
 
 ifeq ($(v),2)
+PRE =
+endif
+
+ifeq ($(v),3)
 PRE         =
+BUILD_DEBUG = 1
+endif
+
+ifeq ($(v),4)
+PRE         =
+BUILD_DEBUG = 1
 REBAR_DEBUG = 1
 endif
 
@@ -43,11 +54,12 @@ all: test docs package
 
 compile:
 	@ echo Compiling code
-	$(PRE)                                         \
-            export $(NAME_UPPER)_BUILD=COMPILE      && \
-            export DEBUG=$(REBAR_DEBUG)             && \
+	$(PRE) \
+            export $(NAME_UPPER)_BUILD=COMPILE && \
+            export DEBUG=$(REBAR_DEBUG) && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            $(REBAR) compile                           \
+            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            $(REBAR) compile \
         $(POST)
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/{{name}}/ebin $(CURDIR)
 
@@ -59,6 +71,7 @@ shell:
             export $(NAME_UPPER)_BUILD=SHELL && \
             export DEBUG=$(REBAR_DEBUG) && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
             $(REBAR) compile \
         $(POST) && \
         erl -pa `ls -d _build/default/lib/*/ebin` \
@@ -74,6 +87,7 @@ docs:
             export $(NAME_UPPER)_BUILD=DOC && \
             export DEBUG=$(REBAR_DEBUG) && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
             $(REBAR) edoc \
         $(POST)
 
@@ -87,6 +101,7 @@ dialyzer: compile
             export $(NAME_UPPER)_BUILD=DIALYZER && \
             export DEBUG=$(REBAR_DEBUG) && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
             $(REBAR) dialyzer \
         $(POST)
 
@@ -97,6 +112,7 @@ cover: compile
             export $(NAME_UPPER)_BUILD=TEST && \
             export DEBUG=$(REBAR_DEBUG) && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
             $(REBAR) do ct, cover \
         $(POST)
 	@ echo Coverage summary:
@@ -118,6 +134,7 @@ release: compile
             export $(NAME_UPPER)_BUILD=RELEASE && \
             export DEBUG=$(REBAR_DEBUG) && \
             export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
             $(REBAR) release \
         $(POST)
 	$(PRE) mkdir -p $(CURDIR)/$(RELEASE_NAME) $(POST)
@@ -134,12 +151,17 @@ tar:
 
 clean:
 	@ echo Cleaning out
-	$(PRE) $(REBAR) clean $(POST)
+	$(PRE) \
+            export $(NAME_UPPER)_BUILD=CLEAN && \
+            export DEBUG=$(REBAR_DEBUG) && \
+            export $(NAME_UPPER)_VERSION=$(VERSION) && \
+            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            $(REBAR) clean $(POST)
 	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
 
 
 distclean: clean
-	$(PRE) rm -rf _build rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz {{name}}.tar.gz ebin tools/user_default.beam $(POST)
+	$(PRE) rm -rf _build rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz {{name}}.tar.gz ebin tools/user_default.beam rebar3.crashdump $(POST)
 
 
 docker:

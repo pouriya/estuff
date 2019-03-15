@@ -2,24 +2,9 @@
 
 NameUpper = string:to_upper("{{name}}").
 
-BuildType = 
-    case os:getenv(NameUpper ++ "_BUILD") of
-        false ->
-            default;
-        BuildTypeX ->
-            erlang:list_to_atom(string:to_lower(BuildTypeX))
-    end.
+BuildType = erlang:list_to_atom(string:to_lower(os:getenv(NameUpper ++ "_BUILD", default))).
 
-
-Version =
-    case os:getenv(NameUpper ++ "_VERSION") of
-        false ->
-            {Y, Mo, D} = erlang:date(),
-            {H, Mi, S} = erlang:time(),
-            lists:flatten(io_lib:format("~p.~p.~p.~p.~p.~p", [Y, Mo, D, H, Mi, S]));
-        VersionX ->
-            VersionX
-    end.
+Version = os:getenv(NameUpper ++ "_VERSION", "0.0.0").
 
 
 Release =
@@ -53,6 +38,12 @@ Shell =
     end.
 
 
+Clean =
+    fun() ->
+        CONFIG
+    end.
+
+
 Default = 
     fun() ->
         CONFIG
@@ -73,12 +64,19 @@ Cfg =
             Docs();
         shell -> 
             Shell();
+        clean ->
+            Clean();
         _ -> % default: Used as dependency
             Default()
     end
     ++
     [].
 
-%io:format("~p\n", [Cfg]).
+case os:getenv(NameUpper ++ "_BUILD_DEBUG") of
+    "1" ->
+        io:format("REBAR configuration for '{{name}}' with build type '~p': ~p\n\n", [BuildType, Cfg]);
+    _ ->
+        ok
+end.
 
 Cfg.
