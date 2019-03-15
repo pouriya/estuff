@@ -148,31 +148,62 @@ Use `make package` to generate `foo-0.0.0.tar.gz`
 `package`: Builds a zip file containing release.  
 
 # make options
-By default its verbosity is `1`. Use `v=2` to enable `rebar3` debug too:  
+By default its verbosity is `1`. Use  
+`v=2` to see commands.  
+`v=3` to see what options are passed to `rebar`.  
+`v=4` to enable `rebar3` debug too.  
 ```sh
-~/foo $ make compile v=2
+~/foo $ make compile v=4
 Compiling code
-                                        \
+\
             export FOO_BUILD=COMPILE && \
-            export DEBUG=1           && \
+            export DEBUG=1 && \
             export FOO_VERSION=0.0.0 && \
-            ~/foo/tools/rebar3 compile  \
+            export FOO_BUILD_DEBUG=1 && \
+            /opt/estuff/test/foo/tools/rebar3 compile \
         
 ===> Evaluating config script "rebar.config.script"
-===> Load global config file /home/user/.config/rebar3/rebar.config
+REBAR configuration for 'foo' with build type 'compile': [{erl_opts,
+                                                           [debug_info]},
+                                                          {deps,[]},
+                                                          {cover_enabled,true},
+                                                          {cover_export_enabled,
+                                                           true},
+                                                          {dialyzer,
+                                                           [{warnings,
+                                                             [no_return]},
+                                                            {plt_apps,
+                                                             top_level_deps},
+                                                            {plt_prefix,
+                                                             "foo"}]},
+                                                          {edoc_opts,[]},
+                                                          {relx,
+                                                           [{include_erts,
+                                                             true},
+                                                            {include_src,
+                                                             false},
+                                                            {dev_mode,false},
+                                                            {generate_start_script,
+                                                             true},
+                                                            {extended_start_script,
+                                                             true},
+                                                            {sys_config,
+                                                             "./config/sys.config"},
+                                                            {vm_args,
+                                                             "./config/vm.args"}]}]
+
 ===> Expanded command sequence to be run: [{default,app_discovery},
                                                   {default,install_deps},
                                                   {default,lock},
                                                   {default,compile}]
-===> Provider: {default,app_discovery}
-===> Evaluating config script "~/foo/rebar.config.script"
-===> Evaluating config script "~/foo/rebar.config.script"
+### Lots of rebar debug info
 
+===> run_hooks("/opt/estuff/test/foo", post_hooks, compile) -> no hooks defined
 
-### Lots of Rebar debug info
+===> run_hooks("/opt/estuff/test/foo", post_hooks, compile) -> no hooks defined
 
+cp -r /opt/estuff/test/foo/_build/default/lib/foo/ebin /opt/estuff/test/foo
 
-cp -r ~/foo/_build/default/lib/foo/ebin ~/foo
 ```
 Also you can use `v=0` to see less information.  
 
