@@ -2,7 +2,7 @@
 
 NameUpper = string:to_upper("{{name}}").
 
-BuildType = erlang:list_to_atom(string:to_lower(os:getenv(NameUpper ++ "_BUILD", default))).
+BuildType = erlang:list_to_atom(string:to_lower(os:getenv(NameUpper ++ "_BUILD", "DEFAULT"))).
 
 Version = os:getenv(NameUpper ++ "_VERSION", "0.0.0").
 
