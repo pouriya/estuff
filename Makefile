@@ -1,4 +1,4 @@
-.Phony: install uninstall test
+.PHONY: install uninstall test
 
 install:
 	@ mkdir -p ~/.config/rebar3
