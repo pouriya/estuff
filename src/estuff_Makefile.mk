@@ -74,11 +74,12 @@ shell:
             export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
             $(REBAR) compile \
         $(POST) && \
-        erl -pa `ls -d _build/default/lib/*/ebin` \
+        erl     -pa `ls -d _build/default/lib/*/ebin` \
                 -pz $(TOOLS_DIR) \
                 -config $(CFG_DIR)/sys.config \
                 -args_file $(CFG_DIR)/vm.args \
-                -eval "begin application:load('{{name}}'), catch code:load_file('{{name}}') end"
+                -eval "begin application:load('{{name}}'), catch code:load_file('{{name}}') end" \
+                +B
 
 
 docs:
