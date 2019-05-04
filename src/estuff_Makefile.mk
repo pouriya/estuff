@@ -46,7 +46,7 @@ $(error Could not found Erlang/OTP ('erl' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell docs test dialyzer cover release package tar clean distclean docker push
+.PHONY: all compile shell docs test dialyzer cover release package package-src package-app package-release clean distclean docker push
 
 
 all: test docs package
@@ -93,7 +93,7 @@ docs:
         $(POST)
 
 
-test: cover
+test: cover dialyzer
 
 
 dialyzer: compile
@@ -142,12 +142,37 @@ release: compile
 	$(PRE) cp -r $(RELEASE_DIR)/* $(CURDIR)/$(RELEASE_NAME) $(POST)
 
 
-package: release
-	$(PRE) tar -zcvf $(RELEASE_NAME).tar.gz $(CURDIR)/$(RELEASE_NAME) $(POST)
+package-release: release
+	$(PRE) tar -zcvf $(RELEASE_NAME)-release.tar.gz $(RELEASE_NAME) $(POST)
 
 
-tar:
-	$(PRE) (rm -rf ./{{name}}.tar.gz) && (find ./ -type f > ../.{{name}}_archive) && (tar -zcvf {{name}}.tar.gz -T - < ../.{{name}}_archive) && rm -rf ../.{{name}}_archive $(POST)
+package-src: compile
+	$(PRE) \
+            find src/ -type f > .tar && \
+            find include/ -type f >> .tar && \
+            find config/ -type f >> .tar && \
+            find tools/ -type f >> .tar && \
+            find test/ -type f >> .tar && \
+            echo Dockerfile >> .tar && \
+            echo LICENSE >> .tar && \
+            echo Makefile >> .tar && \
+            echo README.md >> .tar && \
+            echo rebar.config >> .tar && \
+            echo rebar.config.script >> .tar && \
+            tar -zcvf $(RELEASE_NAME)-src.tar.gz -T .tar && \
+            rm -rf .tar $(POST)
+
+
+package-app: compile
+	$(PRE) \
+            find src/ -type f > .tar && \
+            find include/ -type f >> .tar && \
+            find ebin -type f >> .tar && \
+            tar -zcvf $(RELEASE_NAME)-app.tar.gz -T .tar && \
+            rm -rf .tar $(POST)
+
+
+package: package-src package-app package-release
 
 
 clean:
@@ -162,7 +187,7 @@ clean:
 
 
 distclean: clean
-	$(PRE) rm -rf _build rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz {{name}}.tar.gz ebin tools/user_default.beam rebar3.crashdump $(POST)
+	$(PRE) rm -rf _build rebar.lock $(RELEASE_NAME) $(RELEASE_NAME)-*.tar.gz ebin tools/user_default.beam *.crashdump $(POST)
 
 
 docker:
