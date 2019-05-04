@@ -41,8 +41,6 @@
 
 {template, "estuff_coverage_summary.awk", "{{name}}/tools/coverage_summary.awk"}.
 
-{file, "estuff_VERSION", "{{name}}/VERSION"}.
-
 {template, "estuff_shell_quick_test.script", "{{name}}/test/shell_quick_test.script"}.
 
 {template, "estuff_Dockerfile", "{{name}}/Dockerfile"}.

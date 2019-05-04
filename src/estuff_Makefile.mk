@@ -5,7 +5,7 @@ TOOLS_DIR    = $(CURDIR)/tools
 REBAR        = $(TOOLS_DIR)/rebar3
 ERL         := $(shell command -v erl 2> /dev/null)
 RELEASE_DIR  = $(CURDIR)/_build/default/rel/{{name}}
-VERSION     := $(shell cat VERSION | tr -ds \n \r)
+VERSION     := $(shell erl -noshell -eval 'io:format("~s", [case file:consult("$(CURDIR)/src/{{name}}.app.src") of {ok, [{_, _, Terms}]} -> proplists:get_value(vsn, Terms, "0.0.0"); _ -> "0.0.0" end]),erlang:halt().')
 RELEASE_NAME = {{name}}-$(VERSION)
 NAME_UPPER  := $(shell echo {{name}} | awk '{print toupper($$1)}')
 
