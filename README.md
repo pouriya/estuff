@@ -6,7 +6,7 @@ Erlang [rebar3](https://rebar3.org) template for making new Erlang/OTP project.
 ```sh
 ~ $ git clone --depth=1 https://github.com/Pouriya-Jahanbakhsh/estuff && cd estuff
 ...
-~/estuff $ make install
+~/estuff $ make install # or gmake install on FreeBSD
 ```
 You can also use `make uninstall`. Note that you should replace your email in `./src/estuff.template`. 
 
@@ -41,7 +41,7 @@ You can also use `make uninstall`. Note that you should replace your email in `.
 
 ## Shell
 ```sh
-~/foo $ make shell
+~/foo $ make shell # use gmake on FreeBSD
 Compiling user_default module
 ===> Verifying dependencies...
 ===> Compiling foo
