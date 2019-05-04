@@ -152,14 +152,11 @@ foo-0.0.0-app.tar.gz  foo-0.0.0-release.tar.gz  foo-0.0.0-src.tar.gz
 `all`: Compiles, Runs tests, Shows coverage summary and builds release package.  
 `compile`: Compiles code.  
 `dialyzer`: Runs dialyzer for this project.  
-`cover`: Same as `test`.  
 `docs`: Makes `edoc` for this project.  
 `clean`: Runs `rebar3 clean`.  
 `distclean`: Runs `rebar3 clean` and removes `rebar.lock`, created release directory, `./ebin` directory, etc.  
 `push`: Runs tests and runs `git push origin master` if test passed.  
 `docker`: Builds docker image for project's release. At the time I did not test it.  
-`tar`: Builds a zip file containing all project's files.  
-`package`: Builds a zip file containing release.  
 
 # make options
 By default its verbosity is `1`. Use  
