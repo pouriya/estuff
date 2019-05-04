@@ -131,7 +131,21 @@ Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:
 Eshell V9.3  (abort with ^G)
 (foo@localhost)1>
 ```
-Use `make package` to generate `foo-0.0.0.tar.gz`
+
+## Packaging
+```sh
+~/foo $ make package
+
+
+# ...
+
+
+~/foo $ ls *.tar.gz
+foo-0.0.0-app.tar.gz  foo-0.0.0-release.tar.gz  foo-0.0.0-src.tar.gz 
+```
+foo-0.0.0-app.tar.gz: contains application source with compiled erlang files.  
+foo-0.0.0-release.tar.gz: contains erlang release with all dependencies + sasl + erts.  
+foo-0.0.0-src.tar.gz: contains application source with build configuration files.  
 
 
 ## Other make targets
