@@ -143,10 +143,12 @@ release: compile
 
 
 package-release: release
+	@ echo Packaging release to $(RELEASE_NAME)-release.tar.gz
 	$(PRE) tar -zcvf $(RELEASE_NAME)-release.tar.gz $(RELEASE_NAME) $(POST)
 
 
 package-src: compile
+	@ echo Packaging source to $(RELEASE_NAME)-src.tar.gz
 	$(PRE) \
             find src/ -type f > .tar && \
             find include/ -type f >> .tar && \
@@ -159,16 +161,17 @@ package-src: compile
             echo README.md >> .tar && \
             echo rebar.config >> .tar && \
             echo rebar.config.script >> .tar && \
-            tar -zcvf $(RELEASE_NAME)-src.tar.gz -T .tar && \
+            tar -zcvf $(RELEASE_NAME)-src.tar.gz -T .tar $(POST) && \
             rm -rf .tar $(POST)
 
 
 package-app: compile
+	@ echo Packaging application to $(RELEASE_NAME)-app.tar.gz
 	$(PRE) \
             find src/ -type f > .tar && \
             find include/ -type f >> .tar && \
             find ebin -type f >> .tar && \
-            tar -zcvf $(RELEASE_NAME)-app.tar.gz -T .tar && \
+            tar -zcvf $(RELEASE_NAME)-app.tar.gz -T .tar $(POST) && \
             rm -rf .tar $(POST)
 
 
