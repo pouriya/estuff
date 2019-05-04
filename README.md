@@ -143,9 +143,9 @@ Eshell V9.3  (abort with ^G)
 ~/foo $ ls *.tar.gz
 foo-0.0.0-app.tar.gz  foo-0.0.0-release.tar.gz  foo-0.0.0-src.tar.gz 
 ```
-**<NAME>-<VERSION>-app.tar.gz:** contains application source with compiled erlang files.  
-**<NAME>-<VERSION>-release.tar.gz:** contains erlang release with all dependencies + sasl + erts.  
-**<NAME>-<VERSION>-src.tar.gz:** contains application source with build configuration files.  
+**NAME-VERSION-app.tar.gz:** contains application source with compiled erlang files.  
+**NAME-VERSION-release.tar.gz:** contains erlang release with all dependencies + sasl + erts.  
+**NAME-VERSION-src.tar.gz:** contains application source with build configuration files.  
 
 
 ## Other make targets
