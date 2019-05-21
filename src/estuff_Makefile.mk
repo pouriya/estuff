@@ -144,22 +144,27 @@ release: compile
 
 package-release: release
 	@ echo Packaging release to $(RELEASE_NAME)-release.tar.gz
-	$(PRE) tar -zcvf $(RELEASE_NAME)-release.tar.gz $(RELEASE_NAME) $(POST)
-
+	$(PRE) \
+            rm -rf .tar && \
+            find $(RELEASE_NAME)/ -type f > .tar && \
+            tar -zcvf $(RELEASE_NAME)-release.tar.gz -T .tar $(POST) && \
+            rm -rf .tar $(POST)
 
 package-src: compile
 	@ echo Packaging source to $(RELEASE_NAME)-src.tar.gz
 	$(PRE) \
+            rm -rf .tar && \
             find src/ -type f > .tar && \
-            find include/ -type f >> .tar && \
+            find include/ -type f >> .tar || true && \
             find config/ -type f >> .tar && \
             find tools/ -type f >> .tar && \
             find test/ -type f >> .tar && \
-            echo Dockerfile >> .tar && \
+            find priv/ -type f >> .tar || true && \
+            echo Dockerfile >> .tar || true && \
             echo LICENSE >> .tar && \
             echo Makefile >> .tar && \
             echo README.md >> .tar && \
-            echo rebar.config >> .tar && \
+            echo rebar.config >> .tar || true && \
             echo rebar.config.script >> .tar && \
             tar -zcvf $(RELEASE_NAME)-src.tar.gz -T .tar $(POST) && \
             rm -rf .tar $(POST)
@@ -168,9 +173,11 @@ package-src: compile
 package-app: compile
 	@ echo Packaging application to $(RELEASE_NAME)-app.tar.gz
 	$(PRE) \
+            rm -rf .tar && \
             find src/ -type f > .tar && \
-            find include/ -type f >> .tar && \
-            find ebin -type f >> .tar && \
+            find include/ -type f >> .tar || true && \
+            find ebin/ -type f >> .tar && \
+            find priv/ -type f >> .tar || true && \
             tar -zcvf $(RELEASE_NAME)-app.tar.gz -T .tar $(POST) && \
             rm -rf .tar $(POST)
 
