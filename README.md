@@ -33,7 +33,6 @@ You can also use `make uninstall`. Note that you should replace your email in `.
 ===> Writing foo/test/foo_SUITE.erl
 ===> Writing foo/include/foo.hrl
 ===> Writing foo/tools/coverage_summary.awk
-===> Writing foo/VERSION
 ===> Writing foo/test/shell_quick_test.script
 ===> Writing foo/Dockerfile
 ~/foo $
@@ -49,7 +48,7 @@ Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:
 Eshell V9.3  (abort with ^G)
 (foo@localhost)1>
 ```
-Module `foo` is loaded in  shell:
+Module `foo` is loaded in shell:
 ```erlang
 (foo@localhost)1> foo: % use Tab key
 module_info/0  module_info/1  start/0        stop/0
