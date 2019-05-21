@@ -44,3 +44,5 @@
 {template, "estuff_shell_quick_test.script", "{{name}}/test/shell_quick_test.script"}.
 
 {template, "estuff_Dockerfile", "{{name}}/Dockerfile"}.
+
+{dir, "{{name}}/priv"}.
