@@ -8,6 +8,8 @@ RELEASE_DIR  = $(CURDIR)/_build/default/rel/{{name}}
 VERSION     := $(shell erl -noshell -eval 'io:format("~s", [case file:consult("$(CURDIR)/src/{{name}}.app.src") of {ok, [{_, _, Terms}]} -> proplists:get_value(vsn, Terms, "0.0.0"); _ -> "0.0.0" end]),erlang:halt().')
 RELEASE_NAME = {{name}}-$(VERSION)
 NAME_UPPER  := $(shell echo {{name}} | awk '{print toupper($$1)}')
+BUILD_KEY    = $(NAME_UPPER)_BUILD
+EXPORT_VERSION = export $(NAME_UPPER)_VERSION=$(VERSION)
 
 PRE         = @
 POST        =
@@ -34,6 +36,9 @@ BUILD_DEBUG = 1
 REBAR_DEBUG = 1
 endif
 
+EXPORT_REBAR_DEBUG = export DEBUG=$(REBAR_DEBUG)
+EXPORT_BUILD_DEBUG = export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG)
+
 coverage = 0
 ifeq ($(coverage),0)
 coverage = /dev/null
@@ -46,7 +51,7 @@ $(error Could not found Erlang/OTP ('erl' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell docs test dialyzer cover release package package-src package-app package-release clean distclean docker push
+.PHONY: all compile shell docs test dialyzer cover release package package-src package-app package-release clean clean-packages distclean docker push
 
 
 all: test docs package
@@ -55,10 +60,10 @@ all: test docs package
 compile:
 	@ echo Compiling code
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=COMPILE && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            export $(BUILD_KEY)=COMPILE && \
+            $(EXPORT_REBAR_DEBUG) && \
+            $(EXPORT_VERSION) && \
+            $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) compile \
         $(POST)
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/{{name}}/ebin $(CURDIR)
@@ -68,10 +73,10 @@ shell:
 	@ echo Compiling user_default module
 	$(PRE) erlc -o $(TOOLS_DIR) $(TOOLS_DIR)/user_default.erl $(POST)
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=SHELL && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            export $(BUILD_KEY)=SHELL && \
+            $(EXPORT_REBAR_DEBUG) && \
+            $(EXPORT_VERSION) && \
+            $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) compile \
         $(POST) && \
         erl     -pa `ls -d _build/default/lib/*/ebin` \
@@ -85,10 +90,10 @@ shell:
 docs:
 	@ echo Building documentation
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=DOC && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            export $(BUILD_KEY)=DOC && \
+            $(EXPORT_REBAR_DEBUG) && \
+            $(EXPORT_VERSION) && \
+            $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) edoc \
         $(POST)
 
@@ -99,10 +104,10 @@ test: cover dialyzer
 dialyzer: compile
 	@ echo Running dialyzer
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=DIALYZER && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            export $(BUILD_KEY)=DIALYZER && \
+            $(EXPORT_REBAR_DEBUG) && \
+            $(EXPORT_VERSION) && \
+            $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) dialyzer \
         $(POST)
 
@@ -110,10 +115,10 @@ dialyzer: compile
 cover: compile
 	@ echo Running tests
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=TEST && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            export $(BUILD_KEY)=TEST && \
+            $(EXPORT_REBAR_DEBUG) && \
+            $(EXPORT_VERSION) && \
+            $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) do ct, cover \
         $(POST)
 	@ echo Coverage summary:
@@ -132,17 +137,17 @@ cover: compile
 release: compile
 	@ echo Building release $(RELEASE_NAME)
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=RELEASE && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            export $(BUILD_KEY)=RELEASE && \
+            $(EXPORT_REBAR_DEBUG) && \
+            $(EXPORT_VERSION) && \
+            $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) release \
         $(POST)
 	$(PRE) mkdir -p $(CURDIR)/$(RELEASE_NAME) $(POST)
 	$(PRE) cp -r $(RELEASE_DIR)/* $(CURDIR)/$(RELEASE_NAME) $(POST)
 
 
-package-release: release
+package-release: release clean-packages
 	@ echo Packaging release to $(RELEASE_NAME)-release.tar.gz
 	$(PRE) \
             rm -rf .tar && \
@@ -150,27 +155,27 @@ package-release: release
             tar -zcvf $(RELEASE_NAME)-release.tar.gz -T .tar $(POST) && \
             rm -rf .tar $(POST)
 
-package-src: compile
+package-src: compile clean-packages
 	@ echo Packaging source to $(RELEASE_NAME)-src.tar.gz
 	$(PRE) \
             rm -rf .tar && \
             find src/ -type f > .tar && \
             find include/ -type f >> .tar || true && \
-            find config/ -type f >> .tar && \
-            find tools/ -type f >> .tar && \
-            find test/ -type f >> .tar && \
+            find config/ -type f >> .tar || true && \
+            find tools/ -type f >> .tar || true && \
+            find test/ -type f >> .tar || true && \
             find priv/ -type f >> .tar || true && \
             echo Dockerfile >> .tar || true && \
-            echo LICENSE >> .tar && \
+            echo LICENSE >> .tar || true && \
             echo Makefile >> .tar && \
-            echo README.md >> .tar && \
+            echo README.md >> .tar || true && \
             echo rebar.config >> .tar || true && \
             echo rebar.config.script >> .tar && \
             tar -zcvf $(RELEASE_NAME)-src.tar.gz -T .tar $(POST) && \
             rm -rf .tar $(POST)
 
 
-package-app: compile
+package-app: compile clean-packages
 	@ echo Packaging application to $(RELEASE_NAME)-app.tar.gz
 	$(PRE) \
             rm -rf .tar && \
@@ -185,15 +190,19 @@ package-app: compile
 package: package-src package-app package-release
 
 
-clean:
+clean: clean-packages
 	@ echo Cleaning out
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=CLEAN && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            export $(NAME_UPPER)_BUILD_DEBUG=$(BUILD_DEBUG) && \
+            export $(BUILD_KEY)=CLEAN && \
+            $(EXPORT_REBAR_DEBUG) && \
+            $(EXPORT_VERSION) && \
+            $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) clean $(POST)
 	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
+
+
+clean-packages:
+	$(PRE) rm -rf $(RELEASE_NAME)-*.tar.gz $(POST)
 
 
 distclean: clean
