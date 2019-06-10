@@ -46,3 +46,5 @@
 {template, "estuff_Dockerfile", "{{name}}/Dockerfile"}.
 
 {dir, "{{name}}/priv"}.
+
+{template, "estuff_gitignore", "{{name}}/.gitignore"}.

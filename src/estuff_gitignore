@@ -1,0 +1,11 @@
+*.beam
+*.o
+*.plt
+*.gz
+*.dump
+
+/_build
+/ebin
+/doc
+.*
+/{{name}}-*
