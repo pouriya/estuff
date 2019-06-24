@@ -51,7 +51,7 @@ $(error Could not found Erlang/OTP ('erl' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell docs test dialyzer cover release package package-src package-app package-release clean clean-packages distclean docker push
+.PHONY: all compile shell shell-compile docs test dialyzer cover release package package-src package-app package-release clean clean-packages distclean docker push
 
 
 all: test docs package
@@ -69,7 +69,16 @@ compile:
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/{{name}}/ebin $(CURDIR)
 
 
-shell:
+shell: shell-compile
+	$(PRE) erl -pa `ls -d _build/default/lib/*/ebin` \
+                   -pz $(TOOLS_DIR) \
+                   -config $(CFG_DIR)/sys.config \
+                   -args_file $(CFG_DIR)/vm.args \
+                   -eval "begin application:load('{{name}}'), code:load_file('{{name}}'), case application:get_all_key('{{name}}') of {ok, K} -> lists:foreach(fun code:load_file/1, proplists:get_value(modules, K, [])); _ -> ok end end" \
+                   +B
+
+
+shell-compile:
 	@ echo Compiling user_default module
 	$(PRE) erlc -o $(TOOLS_DIR) $(TOOLS_DIR)/user_default.erl $(POST)
 	$(PRE) \
@@ -78,13 +87,7 @@ shell:
             $(EXPORT_VERSION) && \
             $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) compile \
-        $(POST) && \
-        erl     -pa `ls -d _build/default/lib/*/ebin` \
-                -pz $(TOOLS_DIR) \
-                -config $(CFG_DIR)/sys.config \
-                -args_file $(CFG_DIR)/vm.args \
-                -eval "begin application:load('{{name}}'), catch code:load_file('{{name}}') end" \
-                +B
+        $(POST)
 
 
 docs:

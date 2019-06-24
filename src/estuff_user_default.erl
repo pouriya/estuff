@@ -5,7 +5,7 @@
 
 
 c() ->
-    io:format(os:cmd("make compile")).
+    io:format(os:cmd("make shell-compile")).
 
 
 r() ->
