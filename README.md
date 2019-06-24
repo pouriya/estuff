@@ -58,12 +58,17 @@ You can edit project files and recompile/reload all files without restarting she
 ```erlang
 (foo@localhost)1> cr(). % use c() to just compile them and use r() to just reload them
 make[1]: Entering directory '~/foo'
-Compiling code
+Removing .beam files
+===> Verifying dependencies...
+===> Compiling foo
 make[1]: Leaving directory '~/foo'
-Reloading foo
-Reloading foo_app
-Reloading foo_sup
-Reloading foo_utils
+Reloading modules ...
+
+foo                     foo_app                 foo_sup                 
+foo_utils               
+
+4 Modules have been reloaded
+
 ok
 ```
 
