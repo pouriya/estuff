@@ -48,10 +48,10 @@ Erlang/OTP 20 [erts-9.3] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:
 Eshell V9.3  (abort with ^G)
 (foo@localhost)1>
 ```
-Module `foo` is loaded in shell:
+All application's modules are loaded in shell:
 ```erlang
-(foo@localhost)1> foo: % use Tab key
-module_info/0  module_info/1  start/0        stop/0
+(foo@localhost)1> foo % use Tab key
+foo          foo_app      foo_sup      foo_utils
 ```
 
 You can edit project files and recompile/reload all files without restarting shell:
