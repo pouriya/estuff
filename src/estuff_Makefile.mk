@@ -148,7 +148,7 @@ release: compile
 
 
 package-release: release clean-packages
-	@ echo Packaging release to $(RELEASE_NAME)-release.tar.gz
+	@ echo Packaging release to $(RELEASE_NAME)-`uname -s`-`uname -r`.tar.gz
 	$(PRE) \
             rm -rf .tar && \
             find $(RELEASE_NAME)/ -type f > .tar && \
