@@ -152,7 +152,7 @@ package-release: release clean-packages
 	$(PRE) \
             rm -rf .tar && \
             find $(RELEASE_NAME)/ -type f > .tar && \
-            tar -zcvf $(RELEASE_NAME)-release.tar.gz -T .tar $(POST) && \
+            tar -zcvf $(RELEASE_NAME)-`uname -s`-`uname -r`.tar.gz -T .tar $(POST) && \
             rm -rf .tar $(POST)
 
 package-src: compile clean-packages
