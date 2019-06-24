@@ -51,13 +51,13 @@ $(error Could not found Erlang/OTP ('erl' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell shell-compile docs test dialyzer cover release package package-src package-app package-release clean clean-packages distclean docker push
+.PHONY: all compile shell shell-compile remove-beams docs test dialyzer cover release package package-src package-app package-release clean clean-packages distclean docker push
 
 
 all: test docs package
 
 
-compile:
+compile: remove-beams
 	@ echo Compiling code
 	$(PRE) \
             export $(BUILD_KEY)=COMPILE && \
@@ -70,6 +70,8 @@ compile:
 
 
 shell: shell-compile
+	@ echo Compiling user_default module
+	$(PRE) erlc -o $(TOOLS_DIR) $(TOOLS_DIR)/user_default.erl $(POST)
 	$(PRE) erl -pa `ls -d _build/default/lib/*/ebin` \
                    -pz $(TOOLS_DIR) \
                    -config $(CFG_DIR)/sys.config \
@@ -78,9 +80,7 @@ shell: shell-compile
                    +B
 
 
-shell-compile:
-	@ echo Compiling user_default module
-	$(PRE) erlc -o $(TOOLS_DIR) $(TOOLS_DIR)/user_default.erl $(POST)
+shell-compile: remove-beams
 	$(PRE) \
             export $(BUILD_KEY)=SHELL && \
             $(EXPORT_REBAR_DEBUG) && \
@@ -88,6 +88,11 @@ shell-compile:
             $(EXPORT_BUILD_DEBUG) && \
             $(REBAR) compile \
         $(POST)
+
+
+remove-beams:
+	@ echo Removing .beam files
+	$(PRE) rm -rf _build/default/lib/*/ebin/*.beam $(POST)
 
 
 docs:
