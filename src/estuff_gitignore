@@ -9,3 +9,8 @@
 /doc
 .*
 /{{name}}-*
+
+# Intellij Idea
+{{name}}.iml
+
+#rebar.lock
