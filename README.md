@@ -138,13 +138,13 @@ Compiling code
 Packaging source to foo-0.0.0-src.tar.gz
 Packaging application to foo-0.0.0-app.tar.gz
 Building release foo-0.0.0
-Packaging release to foo-0.0.0-release.tar.gz
+Packaging release to foo-0.0.0-Linux-4.4.0-53-generic.tar.gz
 
 ~/foo $ ls *.tar.gz
-foo-0.0.0-app.tar.gz  foo-0.0.0-release.tar.gz  foo-0.0.0-src.tar.gz 
+foo-0.0.0-app.tar.gz  foo-0.0.0-Linux-4.4.0-53-generic.tar.gz  foo-0.0.0-src.tar.gz 
 ```
 `NAME-VERSION-app.tar.gz`: contains application source with compiled erlang files.  
-`NAME-VERSION-release.tar.gz`: contains erlang release with all dependencies + sasl + erts.  
+`NAME-VERSION-OS_NAME-OS_VERSION.tar.gz`: contains erlang release with all dependencies + sasl + erts.  
 `NAME-VERSION-src.tar.gz`: contains application source with build configuration files.  
 
 
